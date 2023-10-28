@@ -1,0 +1,22 @@
+{
+    "name": "wmud/hyperf-lib",
+    "description": "hyperf3.0 components.",
+    "autoload": {
+        "psr-4": {
+            "Wmud\\HyperfLib\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "wmud"
+        }
+    ],
+    "require": {
+        "hyperf/guzzle": "^3.0",
+        "hyperf/redis": "^3.0",
+        "hyperf/logger": "^3.0",
+        "ext-openssl": "*",
+        "hyperf/config": "^3.0",
+        "phpoffice/phpspreadsheet": "^1.29"
+    }
+}
