@@ -79,8 +79,8 @@ class Client
             'url' => "$this->domain$uri",
             'useTime' => "{$useTime}s",
             'httpStatus' => $this->httpStatus,
-            // 'options' => $this->options,
-            // 'responseBody' => $this->responseBody
+            'options' => $this->options,
+            'responseBody' => $this->responseBody
         ], 'Request');
         return $response;
     }

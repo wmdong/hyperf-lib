@@ -21,8 +21,8 @@ class AppSafety
 
     public function __construct()
     {
-        self::$accessKey = config('access_key', '');
-        self::$accessIV = config('access_iv', '');
+        self::$accessKey = config('access_key');
+        self::$accessIV = config('access_iv');
     }
 
     /**

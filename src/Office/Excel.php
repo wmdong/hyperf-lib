@@ -21,13 +21,13 @@ class Excel
      * vertical string 垂直对其方式 bottom,top,center,justify,distributed
      * horizontal string 水平对其对其方式 general,left,right,center,centerContinuous,justify,fill,distributed
      * @param array $data 数据源 例: [['value' => 'test', width => 16], ['value' => 'test', width => 16]]
-     * @param string $excelName 文件名称
+     * @param string $excelPath 保存文件地址
      * @param int $columnNum 列数
-     * @return void
+     * @return string
      * @throws WriterException
      * @throws Exception
      */
-    public function export(array $data, string $excelName = 'excel-name', int $columnNum = 0): void
+    public function exportXlsx(array $data, string $excelPath, int $columnNum = 0): string
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -80,12 +80,9 @@ class Excel
                 $index++;
             }
         }
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header("Access-Control-Expose-Headers: Content-Disposition");
-        header("Content-Disposition: attachment;filename=$excelName.xlsx");
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $writer->save('php://output');
-        exit();
+        $writer->save($excelPath);
+        return $excelPath;
     }
 
     /**
