@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Wmud\HyperfLib\Middleware;
 
+use Hyperf\Context\ApplicationContext;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Wmud\HyperfLib\Safety\AppSafety;
 use Wmud\HyperfLib\Constants\AppErrorCodeConstant;
-use Hyperf\Di\Annotation\Inject;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -20,15 +22,11 @@ use function Hyperf\Config\config;
 class InitializeMiddleware implements MiddlewareInterface
 {
     /**
-     * @var ResponseInterface
-     */
-    #[Inject]
-    protected ResponseInterface $response;
-
-    /**
      * @param ServerRequestInterface $request
      * @param RequestHandlerInterface $handler
      * @return PsrResponseInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): PsrResponseInterface
     {
@@ -36,7 +34,9 @@ class InitializeMiddleware implements MiddlewareInterface
             $body = $request->getBody()->getContents(); // 请求体
             $appSafety = new AppSafety();
             if (!$decrypt = $appSafety->decrypt($body)) {
-                return $this->response->json([
+                $container = ApplicationContext::getContainer();
+                $response = $container->get(ResponseInterface::class);
+                return $response->json([
                     'code' => AppErrorCodeConstant::VALIDATION_ERROR,
                     'message' => '参数解密失败',
                     'result' => []
