@@ -56,7 +56,7 @@ class AppSafety
             AppLog::error('数据解密失败', ['data' => $data]);
             return false;
         }
-        return $encrypt;
+        return base64_encode($encrypt);
     }
 
     /**
@@ -67,7 +67,7 @@ class AppSafety
     public function decrypt(string $encrypt): array|false
     {
         $decrypt = openssl_decrypt(
-            $encrypt,
+            base64_decode($encrypt),
             'AES-128-CBC',
             self::$accessKey,
             OPENSSL_RAW_DATA,
