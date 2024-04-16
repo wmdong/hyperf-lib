@@ -1,5 +1,6 @@
 {
   "name": "wmud/hyperf-lib",
+  "version": "1.0.5",
   "description": "hyperf3.1 components.",
   "type": "library",
   "license": "MIT",
