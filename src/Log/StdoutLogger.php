@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Wmud\HyperfLib\Log;
 
-use function Hyperf\Config\config;
-
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Context\ApplicationContext;
 use Psr\Container\ContainerExceptionInterface;

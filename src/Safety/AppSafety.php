@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Wmud\HyperfLib\Safety;
 
 use Wmud\HyperfLib\Log\AppLog;
-use function Hyperf\Config\config;
 
 class AppSafety
 {

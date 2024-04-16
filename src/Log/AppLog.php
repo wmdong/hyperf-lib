@@ -2,8 +2,6 @@
 
 namespace Wmud\HyperfLib\Log;
 
-use function Hyperf\Config\config;
-
 use Hyperf\Collection\Arr;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;

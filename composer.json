@@ -1,26 +1,33 @@
 {
   "name": "wmud/hyperf-lib",
-  "description": "hyperf3.0 components.",
-  "autoload": {
-    "psr-4": {
-      "Wmud\\HyperfLib\\": "src/"
-    }
-  },
+  "description": "hyperf3.1 components.",
+  "type": "library",
+  "license": "MIT",
   "authors": [
     {
       "name": "wmud"
     }
   ],
   "require": {
-    "hyperf/guzzle": "^3.0",
-    "hyperf/redis": "^3.0",
-    "hyperf/logger": "^3.0",
-    "hyperf/config": "^3.0",
-    "phpoffice/phpspreadsheet": "^1.29",
-    "hyperf/validation": "^3.0",
-    "ext-redis": "*",
-    "ext-openssl": "*",
-    "ext-bcmath": "*",
-    "hyperf/db-connection": "^3.0"
+    "php": ">=8.1",
+    "hyperf/guzzle": "~3.1.0",
+    "hyperf/redis": "~3.1.0",
+    "hyperf/logger": "~3.1.0",
+    "hyperf/config": "~3.1.0",
+    "hyperf/helper": "~3.1.0",
+    "hyperf/validation": "~3.1.0",
+    "hyperf/db-connection": "~3.1.0",
+    "hyperf/http-server": "~3.1.0",
+    "phpoffice/phpspreadsheet": "^1.29"
+  },
+  "suggest": {
+    "ext-openssl": "Required to use HTTPS.",
+    "ext-redis": "Required to use Redis Client.",
+    "ext-bcmath": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Wmud\\HyperfLib\\": "src/"
+    }
   }
 }

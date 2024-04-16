@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Wmud\HyperfLib\Exception\Handler;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Wmud\HyperfLib\Constants\AppErrorCodeConstant;
 use Hyperf\Validation\ValidationException;
 use Psr\Http\Message\ResponseInterface;
@@ -15,6 +17,8 @@ class ValidationExceptionHandler extends BasisExceptionHandler
      * @param Throwable $throwable
      * @param ResponseInterface $response
      * @return ResponseInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function handle(Throwable $throwable, ResponseInterface $response): ResponseInterface
     {
