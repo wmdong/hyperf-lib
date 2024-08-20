@@ -13,7 +13,7 @@ use Hyperf\HttpServer\Contract\ResponseInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
-abstract class AbstractController
+abstract class AppBaseController
 {
     /**
      * @var ContainerInterface

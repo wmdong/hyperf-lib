@@ -30,8 +30,9 @@ class InitializeMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): PsrResponseInterface
     {
         if (config('data_safety')) {
+            $safetyWay = $request->getHeaderLine('Safety-Way'); // 安全方式
             $body = $request->getBody()->getContents(); // 请求体
-            $appSafety = new AppSafety();
+            $appSafety = new AppSafety($safetyWay);
             if (!$decrypt = $appSafety->decrypt($body)) {
                 $container = ApplicationContext::getContainer();
                 $response = $container->get(ResponseInterface::class);

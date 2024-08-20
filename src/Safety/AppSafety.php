@@ -4,24 +4,30 @@ declare(strict_types=1);
 
 namespace Wmud\HyperfLib\Safety;
 
-use Wmud\HyperfLib\Log\AppLog;
-
 class AppSafety
 {
+
     /**
+     * 密钥
      * @var string
      */
     protected static string $accessKey;
 
     /**
-     * @var string
+     * @var SafetyContract
      */
-    protected static string $accessIV;
+    public SafetyContract $way;
 
-    public function __construct()
+    /**
+     * @param string|null $safetyWay
+     */
+    public function __construct(string $safetyWay = null)
     {
-        self::$accessKey = config('access_key');
-        self::$accessIV = config('access_iv');
+        if (!in_array($safetyWay, ['AES', 'RSA'])) {
+            $safetyWay = 'RSA'; // 默认RSA
+        }
+        $this->way = SafetyFactory::instance($safetyWay);
+        self::$accessKey = config('sign.access_key');
     }
 
     /**
@@ -39,23 +45,12 @@ class AppSafety
 
     /**
      * 数据加密
-     * @param array $data
+     * @param array|string $data
      * @return string|false
      */
-    public function encrypt(array $data): string|false
+    public function encrypt(array|string $data): string|false
     {
-        $encrypt = openssl_encrypt(
-            json_encode($data),
-            'AES-128-CBC',
-            self::$accessKey,
-            OPENSSL_RAW_DATA,
-            self::$accessIV
-        );
-        if (!$encrypt) {
-            AppLog::error('数据解密失败', ['data' => $data]);
-            return false;
-        }
-        return base64_encode($encrypt);
+        return $this->way->encrypt($data);
     }
 
     /**
@@ -65,17 +60,6 @@ class AppSafety
      */
     public function decrypt(string $encrypt): array|false
     {
-        $decrypt = openssl_decrypt(
-            base64_decode($encrypt),
-            'AES-128-CBC',
-            self::$accessKey,
-            OPENSSL_RAW_DATA,
-            self::$accessIV
-        );
-        if (!$decrypt) {
-            AppLog::error('数据解密失败', ['encrypt' => $encrypt]);
-            return false;
-        }
-        return json_decode($decrypt, true);
+        return $this->way->encrypt($encrypt);
     }
 }

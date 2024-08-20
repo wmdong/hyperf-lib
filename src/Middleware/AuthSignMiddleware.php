@@ -32,10 +32,11 @@ class AuthSignMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if (config('sign_auth')) {
+        if (config('sign.auth', false)) {
             $timestamp = (int)$request->getHeaderLine('Timestamp'); // 请求时间戳
             $diffTime = time() - $timestamp;
-            if ($diffTime > 10 || $diffTime < 0) { // 签名时效验证（秒）
+            $timeout = (int)config('sign.timeout', 10); // 签名失效时间
+            if ($diffTime > $timeout || $diffTime < 0) { // 签名时效验证（秒）
                 return $this->responseHandel([
                     'message' => '签名已过期',
                     'timestamp' => $timestamp,
