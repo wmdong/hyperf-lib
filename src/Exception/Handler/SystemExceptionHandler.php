@@ -4,16 +4,21 @@ declare(strict_types=1);
 
 namespace Wmud\HyperfLib\Exception\Handler;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\Log\LogLevel;
 use Wmud\HyperfLib\Constants\AppErrorCodeConstant;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
-class SystemExceptionHandler extends BasisExceptionHandler
+class SystemExceptionHandler extends AppExceptionHandler
 {
     /**
      * @param Throwable $throwable
      * @param ResponseInterface $response
      * @return ResponseInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function handle(Throwable $throwable, ResponseInterface $response): ResponseInterface
     {
@@ -26,7 +31,7 @@ class SystemExceptionHandler extends BasisExceptionHandler
                 'message' => 'Internal Server Error!'
             ],
             '系统异常',
-            'alert',
+            LogLevel::ERROR,
             [
                 'file' => $throwable->getFile(),
                 'line' => $throwable->getLine(),

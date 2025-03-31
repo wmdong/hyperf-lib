@@ -6,12 +6,13 @@ namespace Wmud\HyperfLib\Exception\Handler;
 
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\Log\LogLevel;
 use Wmud\HyperfLib\Constants\AppErrorCodeConstant;
 use Hyperf\Validation\ValidationException;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
-class ValidationExceptionHandler extends BasisExceptionHandler
+class ValidationExceptionHandler extends AppExceptionHandler
 {
     /**
      * @param Throwable $throwable
@@ -38,7 +39,7 @@ class ValidationExceptionHandler extends BasisExceptionHandler
                 'message' => $message
             ],
             'Parameter validation failed!',
-            'error',
+            LogLevel::WARNING,
             $context
         );
     }

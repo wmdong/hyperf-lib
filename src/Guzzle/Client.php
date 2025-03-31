@@ -2,11 +2,17 @@
 
 namespace Wmud\HyperfLib\Guzzle;
 
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\RequestOptions;
+use Psr\Http\Message\ResponseInterface;
 use Wmud\HyperfLib\Log\AppLog;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\GuzzleException;
-use Psr\Http\Message\ResponseInterface;
 
+/**
+ * HTTP客户端
+ */
 class Client
 {
     /**
@@ -26,26 +32,16 @@ class Client
     ];
 
     /**
+     * 域名
      * @var string
      */
     private string $domain;
 
     /**
+     * http客户端
      * @var GuzzleClient
      */
     protected GuzzleClient $http;
-
-    /**
-     * 响应body
-     * @var string
-     */
-    public string $responseBody = '';
-
-    /**
-     * http状态
-     * @var int|null
-     */
-    public int|null $httpStatus = null;
 
     /**
      * @param string $domain
@@ -56,41 +52,57 @@ class Client
         $this->domain = $domain;
         $this->http = new GuzzleClient([
             'base_uri' => $this->domain,
-            'timeout' => $timeout
+            RequestOptions::TIMEOUT => $timeout,
+            RequestOptions::CONNECT_TIMEOUT => $timeout,
+            RequestOptions::HTTP_ERRORS => false, // 禁用4xx和5xx抛出异常
         ]);
     }
 
     /**
+     * 请求
      * @param string $method
      * @param string $uri
-     * @return ResponseInterface
-     * @throws GuzzleException
+     * @return Response
      */
-    public function request(string $method, string $uri): ResponseInterface
+    public function request(string $method, string $uri): Response
     {
         $sTime = microtime(true);
-        $this->options['headers'] = $this->headers;
-        $response = $this->http->request($method, $uri, $this->options);
+        $response = new Response();
+        try {
+            $this->options['headers'] = $this->headers;
+            $res = $this->http->request($method, $uri, $this->options);
+        } catch (RequestException $exception) {
+            $response->httpError = $exception->getMessage();
+            $res = $exception->getResponse();
+        } catch (GuzzleException $exception) {
+            $response->httpError = $exception->getMessage();
+        }
+        if (isset($res) && $res instanceof ResponseInterface) {
+            $response->httpStatus = $res->getStatusCode();
+            $response->responseBody = $res->getBody()->getContents();
+            if ($parse = json_decode($response->responseBody, true)) {
+                $response->code = $parse['code'] ?? null;
+                $response->data = $parse['data'] ?? null;
+                $response->message = $parse['message'] ?? ($parse['msg'] ?? null);
+            }
+        }
         $eTime = microtime(true);
-        $useTime = bcsub((string)$eTime, (string)$sTime, 6);
-        $this->httpStatus = $response->getStatusCode();
-        $this->responseBody = $response->getBody()->getContents();
+        $useTime = round($eTime - $sTime, 3);
         AppLog::info("请求日志", [
             'url' => "$this->domain$uri",
             'useTime' => "{$useTime}s",
-            'httpStatus' => $this->httpStatus,
+            'httpStatus' => $response->httpStatus,
             'options' => $this->options,
-            'responseBody' => $this->responseBody
-        ], 'Request');
+            'responseBody' => $response->responseBody
+        ], 'Http');
         return $response;
     }
 
     /**
      * @param string $uri
-     * @return ResponseInterface
-     * @throws GuzzleException
+     * @return Response
      */
-    public function get(string $uri): ResponseInterface
+    public function get(string $uri): Response
     {
         return $this->request('GET', $uri);
     }
@@ -98,12 +110,13 @@ class Client
     /**
      * @param string $uri
      * @param mixed $params
-     * @return ResponseInterface
-     * @throws GuzzleException
+     * @return Response
      */
-    public function post(string $uri, mixed $params): ResponseInterface
+    public function post(string $uri, mixed $params = null): Response
     {
-        $this->options['body'] = $this->bodyFormat($params);
+        if ($params) {
+            $this->options['body'] = $this->bodyFormat($params);
+        }
         return $this->request('POST', $uri);
     }
 

@@ -13,7 +13,10 @@ use Hyperf\HttpServer\Contract\ResponseInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
-abstract class AppBaseController
+/**
+ * 控制器基类
+ */
+abstract class BaseController
 {
     /**
      * @var ContainerInterface
@@ -70,9 +73,9 @@ abstract class AppBaseController
         $serverParams = $this->request->getServerParams();
         $ip = Arr::get($serverParams, 'remote_addr');
         $uri = Arr::get($serverParams, 'request_uri');
-        $startTime = Arr::get($serverParams, 'request_time_float');
-        $endTime = microtime(true);
-        $useTime = bcsub((string)$endTime, (string)$startTime, 6);
+        $sTime = Arr::get($serverParams, 'request_time_float');
+        $eTime = microtime(true);
+        $useTime = round($eTime - $sTime, 3);
         AppLog::info("[IP: $ip] [URI: $uri] [UseTime: {$useTime}s]", [
             'params' => $this->request->all(),
             'response' => $response

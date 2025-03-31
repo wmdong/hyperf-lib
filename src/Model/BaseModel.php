@@ -6,7 +6,10 @@ namespace Wmud\HyperfLib\Model;
 
 use Hyperf\DbConnection\Model\Model;
 
-abstract class AppBaseModel extends Model
+/**
+ * 模型基类
+ */
+abstract class BaseModel extends Model
 {
     /**
      * 创建时间
