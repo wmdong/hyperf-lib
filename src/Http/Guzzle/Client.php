@@ -1,8 +1,7 @@
 <?php
 
-namespace Wmud\HyperfLib\Guzzle;
+namespace Wmud\HyperfLib\Http\Guzzle;
 
-use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;

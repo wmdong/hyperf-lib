@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace Wmud\HyperfLib\Exception\Handler;
 
+use Hyperf\ExceptionHandler\ExceptionHandler;
+use Hyperf\HttpMessage\Exception\HttpException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Psr\Log\LogLevel;
-use Wmud\HyperfLib\Constants\AppErrorCodeConstant;
-use Hyperf\HttpMessage\Exception\HttpException;
 use Psr\Http\Message\ResponseInterface;
+use Wmud\HyperfLib\Constants\AppErrorCodeConstant;
+use Wmud\HyperfLib\Response\AppResponse;
 use Throwable;
 
-class HttpExceptionHandler extends AppExceptionHandler
+/**
+ * http异常处理
+ */
+class HttpExceptionHandler extends ExceptionHandler
 {
     /**
      * @param Throwable $throwable
@@ -23,20 +27,15 @@ class HttpExceptionHandler extends AppExceptionHandler
      */
     public function handle(Throwable $throwable, ResponseInterface $response): ResponseInterface
     {
-        $this->stopPropagation(); // 阻止异常冒泡
-        $message = $throwable->getMessage(); // 异常消息
-        // 格式化输出
-        return $this->responseHandle(
-            [
-                'result' => [],
-                'code' => AppErrorCodeConstant::HTTP_ERROR,
-                'message' => $message
-            ],
-            $message,
-            LogLevel::WARNING,
-            [],
-            404
-        );
+        if ($throwable instanceof HttpException) {
+            $this->stopPropagation(); // 阻止异常冒泡
+            return AppResponse::response([
+                'code' => AppErrorCodeConstant::HTTP,
+                'msg' => $throwable->getMessage(),
+                'data' => []
+            ], 'warning', 404);
+        }
+        return $response;
     }
 
     /**

@@ -20,7 +20,7 @@ class Excel
      * bold bool 是否加粗
      * vertical string 垂直对其方式 bottom,top,center,justify,distributed
      * horizontal string 水平对其对其方式 general,left,right,center,centerContinuous,justify,fill,distributed
-     * @param array $data 数据源 例: [['value' => 'test', width => 16], ['value' => 'test', width => 16]]
+     * @param array $data 数据源 例: [['value' => 'test', width => 16]]
      * @param string $excelPath 保存文件地址
      * @param int $columnNum 列数
      * @return string

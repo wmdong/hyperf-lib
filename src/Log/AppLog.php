@@ -3,6 +3,7 @@
 namespace Wmud\HyperfLib\Log;
 
 use Hyperf\Collection\Arr;
+use Hyperf\Context\Context;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -28,8 +29,10 @@ class AppLog
      */
     public static function __callStatic(string $name, array $arguments)
     {
+        $requestId = Context::get('requestId');
         $message = Arr::get($arguments, 0, '');
         $context = Arr::get($arguments, 1, []);
+        $context['requestId'] = $requestId;
         $channel = Arr::get($arguments, 2, config('app_name'));
         StdoutLogger::get($channel)->$name($message, $context);
     }

@@ -4,14 +4,20 @@ declare(strict_types=1);
 
 namespace Wmud\HyperfLib\Exception\Handler;
 
+use Hyperf\Context\Context;
+use Hyperf\ExceptionHandler\ExceptionHandler;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Psr\Log\LogLevel;
-use Wmud\HyperfLib\Constants\AppErrorCodeConstant;
 use Psr\Http\Message\ResponseInterface;
+use Wmud\HyperfLib\Constants\AppErrorCodeConstant;
+use Wmud\HyperfLib\Log\AppLog;
+use Wmud\HyperfLib\Response\AppResponse;
 use Throwable;
 
-class SystemExceptionHandler extends AppExceptionHandler
+/**
+ * 全局异常处理
+ */
+class SystemExceptionHandler extends ExceptionHandler
 {
     /**
      * @param Throwable $throwable
@@ -22,24 +28,19 @@ class SystemExceptionHandler extends AppExceptionHandler
      */
     public function handle(Throwable $throwable, ResponseInterface $response): ResponseInterface
     {
+        $requestId = Context::get('requestId');
+        AppLog::error('System Exception', [
+            'requestId' => $requestId,
+            'message' => $throwable->getMessage(),
+            'line' => $throwable->getLine(),
+            'file' => $throwable->getFile(),
+        ]);
         $this->stopPropagation(); // 阻止异常冒泡
-        // 格式化输出
-        return $this->responseHandle(
-            [
-                'result' => [],
-                'code' => AppErrorCodeConstant::SYSTEM_ERROR,
-                'message' => 'Internal Server Error!'
-            ],
-            '系统异常',
-            LogLevel::ERROR,
-            [
-                'file' => $throwable->getFile(),
-                'line' => $throwable->getLine(),
-                'message' => $throwable->getMessage(),
-                'trace' => $throwable->getTrace()
-            ],
-            500
-        );
+        return AppResponse::response([
+            'code' => AppErrorCodeConstant::SYSTEM,
+            'message' => 'Internal Server Error!',
+            'data' => [],
+        ], 'error', 500);
     }
 
     /**

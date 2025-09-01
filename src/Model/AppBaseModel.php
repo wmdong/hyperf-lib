@@ -9,7 +9,7 @@ use Hyperf\DbConnection\Model\Model;
 /**
  * 模型基类
  */
-abstract class BaseModel extends Model
+abstract class AppBaseModel extends Model
 {
     /**
      * 创建时间

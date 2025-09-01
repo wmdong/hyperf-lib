@@ -4,45 +4,44 @@ declare(strict_types=1);
 
 namespace Wmud\HyperfLib\Middleware;
 
-use Hyperf\Context\ApplicationContext;
+use Hyperf\Collection\Arr;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Wmud\HyperfLib\Exception\AppException;
+use Wmud\HyperfLib\Response\AppResponse;
 use Wmud\HyperfLib\Safety\AppSafety;
 use Wmud\HyperfLib\Constants\AppErrorCodeConstant;
-use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
-use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Hyperf\HttpServer\Contract\ResponseInterface;
 
 /**
  * 初始化中间件
  */
-class InitializeMiddleware implements MiddlewareInterface
+class InitializeMiddleware extends AppBaseMiddleware
 {
     /**
      * @param ServerRequestInterface $request
      * @param RequestHandlerInterface $handler
-     * @return PsrResponseInterface
+     * @return ResponseInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws AppException
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): PsrResponseInterface
+    public function logic(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if (config('data_safety')) {
-            $safetyWay = $request->getHeaderLine('Safety-Way'); // 安全方式
-            $body = $request->getBody()->getContents(); // 请求体
-            $appSafety = new AppSafety($safetyWay);
-            if (!$decrypt = $appSafety->decrypt($body)) {
-                $container = ApplicationContext::getContainer();
-                $response = $container->get(ResponseInterface::class);
-                return $response->json([
-                    'code' => AppErrorCodeConstant::VALIDATION_ERROR,
-                    'message' => '参数解密失败',
-                    'result' => []
+        if (config('safety.cipher')) {
+            $appSafety = new AppSafety();
+            $cipheriv = Arr::get($this->params, 'cipheriv', '');
+            $ciphertext = Arr::get($this->params, 'ciphertext', '');
+            if (!$data = $appSafety->decrypt($ciphertext, $cipheriv)) {
+                return AppResponse::response([
+                    'code' => AppErrorCodeConstant::VALIDATION,
+                    'message' => 'Parameter error',
+                    'data' => []
                 ]);
             }
-            $request = $request->withParsedBody($decrypt);
+            $request = $request->withParsedBody($data);
         }
         return $handler->handle($request);
     }

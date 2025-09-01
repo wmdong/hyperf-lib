@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace Wmud\HyperfLib\Exception\Handler;
 
+use Hyperf\ExceptionHandler\ExceptionHandler;
+use Hyperf\Validation\ValidationException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Psr\Log\LogLevel;
-use Wmud\HyperfLib\Constants\AppErrorCodeConstant;
-use Hyperf\Validation\ValidationException;
 use Psr\Http\Message\ResponseInterface;
+use Wmud\HyperfLib\Constants\AppErrorCodeConstant;
+use Wmud\HyperfLib\Response\AppResponse;
 use Throwable;
 
-class ValidationExceptionHandler extends AppExceptionHandler
+/**
+ * 验证异常处理
+ */
+class ValidationExceptionHandler extends ExceptionHandler
 {
     /**
      * @param Throwable $throwable
@@ -23,25 +27,18 @@ class ValidationExceptionHandler extends AppExceptionHandler
      */
     public function handle(Throwable $throwable, ResponseInterface $response): ResponseInterface
     {
-        $message = ''; // 错误消息
-        $context = []; // 日志内容
-        if (isset($throwable->validator)) {
-            $this->stopPropagation(); // 阻止异常冒泡
-            $errors = $throwable->validator->errors(); // 错误信息
-            $message = $errors->first(); // 首个错误信息
-            $context['errors'] = $errors;
+        if ($throwable instanceof ValidationException) {
+            if (isset($throwable->validator)) {
+                $this->stopPropagation(); // 阻止异常冒泡
+                $errors = $throwable->validator->errors(); // 错误信息
+                return AppResponse::response([
+                    'code' => AppErrorCodeConstant::VALIDATION,
+                    'msg' => $errors->first(),
+                    'data' => []
+                ], 'warning');
+            }
         }
-        // 格式化输出
-        return $this->responseHandle(
-            [
-                'result' => [],
-                'code' => AppErrorCodeConstant::VALIDATION_ERROR,
-                'message' => $message
-            ],
-            'Parameter validation failed!',
-            LogLevel::WARNING,
-            $context
-        );
+        return $response;
     }
 
     /**

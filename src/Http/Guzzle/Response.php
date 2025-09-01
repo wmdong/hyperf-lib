@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Wmud\HyperfLib\Guzzle;
+namespace Wmud\HyperfLib\Http\Guzzle;
 
 /**
  * http响应
