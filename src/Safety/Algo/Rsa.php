@@ -65,7 +65,7 @@ class Rsa
         if (is_array($data)) {
             $data = json_encode_256_64($data);
         }
-        if ($key = openssl_pkey_get_public($this->publicKey)) {
+        if (!$key = openssl_pkey_get_public($this->publicKey)) {
             throw new AppException("RSA openssl_pkey_get_public fail");
         }
         if (!openssl_public_encrypt($data, $ciphertext, $key)) {
@@ -83,7 +83,7 @@ class Rsa
     public function decrypt(string $data): string
     {
         $ciphertext = base64_decode($data);
-        if ($key = openssl_pkey_get_private($this->privateKey)) {
+        if (!$key = openssl_pkey_get_private($this->privateKey)) {
             throw new AppException("RSA openssl_pkey_get_private fail");
         }
         if (!openssl_private_decrypt($ciphertext, $plaintext, $key)) {
