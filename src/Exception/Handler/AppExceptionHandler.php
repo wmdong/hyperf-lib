@@ -21,6 +21,7 @@ class AppExceptionHandler extends ExceptionHandler
      * @param Throwable $throwable
      * @param ResponseInterface $response
      * @return ResponseInterface
+     * @throws AppException
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */

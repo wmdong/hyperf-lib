@@ -33,7 +33,7 @@ class AppBaseLogic
     public function __construct(array $params = [])
     {
         $this->params = $params;
-        $this->requestId = Context::get('requestId');
+        $this->requestId = Context::get('RequestId');
     }
 
 }

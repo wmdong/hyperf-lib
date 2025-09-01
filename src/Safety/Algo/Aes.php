@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Wmud\HyperfLib\Safety\Algo;
 
-use Wmud\HyperfLib\Log\AppLog;
 use Wmud\HyperfLib\Exception\AppException;
 
 class Aes
@@ -57,9 +56,7 @@ class Aes
             $iv
         );
         if ($ciphertext === false) {
-            $message = "AES Encrypt fail";
-            AppLog::error($message, ['data' => $data]);
-            throw new AppException($message);
+            throw new AppException("AES Encrypt fail");
         }
         return [
             'ciphertext' => base64_encode($ciphertext),
@@ -85,9 +82,7 @@ class Aes
             $iv
         );
         if ($plaintext === false) {
-            $message = "AES Decrypt fail";
-            AppLog::error($message, ['data' => $data]);
-            throw new AppException($message);
+            throw new AppException("AES Decrypt fail");
         }
         return $plaintext;
     }

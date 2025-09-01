@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Wmud\HyperfLib\Safety\Algo;
 
 use Wmud\HyperfLib\Exception\AppException;
-use Wmud\HyperfLib\Log\AppLog;
 
 class Rsa
 {
@@ -39,8 +38,8 @@ class Rsa
     private function publicKeyFormat(string $publicKey): string
     {
         return "-----BEGIN PUBLIC KEY-----\n" .
-            chunk_split($publicKey, 64, "\n") .
-            "-----END PUBLIC KEY-----\n";
+            chunk_split($publicKey, 64) .
+            "-----END PUBLIC KEY-----";
     }
 
     /**
@@ -50,9 +49,9 @@ class Rsa
      */
     private function privateKeyFormat(string $privateKey): string
     {
-        return "-----BEGIN PRIVATE KEY-----\n" .
-            chunk_split($privateKey, 64, "\n") .
-            "-----END PRIVATE KEY-----\n";
+        return "-----BEGIN RSA PRIVATE KEY-----\n" .
+            chunk_split($privateKey, 64) .
+            "-----END RSA PRIVATE KEY-----";
     }
 
     /**
@@ -66,11 +65,11 @@ class Rsa
         if (is_array($data)) {
             $data = json_encode_256_64($data);
         }
-        $key = openssl_pkey_get_public($this->publicKey);
+        if ($key = openssl_pkey_get_public($this->publicKey)) {
+            throw new AppException("RSA openssl_pkey_get_public fail");
+        }
         if (!openssl_public_encrypt($data, $ciphertext, $key)) {
-            $message = "RSA Encrypt fail";
-            AppLog::error($message, ['data' => $data]);
-            throw new AppException($message);
+            throw new AppException("RSA Encrypt fail");
         }
         return base64_encode($ciphertext);
     }
@@ -84,11 +83,11 @@ class Rsa
     public function decrypt(string $data): string
     {
         $ciphertext = base64_decode($data);
-        $key = openssl_pkey_get_private($this->privateKey);
+        if ($key = openssl_pkey_get_private($this->privateKey)) {
+            throw new AppException("RSA openssl_pkey_get_private fail");
+        }
         if (!openssl_private_decrypt($ciphertext, $plaintext, $key)) {
-            $message = "RSA Decrypt fail";
-            AppLog::error($message, ['data' => $data]);
-            throw new AppException($message);
+            throw new AppException("RSA Decrypt fail");
         }
         return $plaintext;
     }

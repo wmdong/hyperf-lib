@@ -30,10 +30,10 @@ class InitializeMiddleware extends AppBaseMiddleware
      */
     public function logic(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if (config('safety.cipher')) {
+        $ciphertext = Arr::get($this->params, 'ciphertext', '');
+        $cipheriv = Arr::get($this->params, 'cipheriv', '');
+        if (config('safety.cipher') && $ciphertext && $cipheriv) {
             $appSafety = new AppSafety();
-            $cipheriv = Arr::get($this->params, 'cipheriv', '');
-            $ciphertext = Arr::get($this->params, 'ciphertext', '');
             if (!$data = $appSafety->decrypt($ciphertext, $cipheriv)) {
                 return AppResponse::response([
                     'code' => AppErrorCodeConstant::VALIDATION,

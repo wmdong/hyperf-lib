@@ -10,6 +10,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Wmud\HyperfLib\Constants\AppErrorCodeConstant;
+use Wmud\HyperfLib\Exception\AppException;
 use Wmud\HyperfLib\Log\AppLog;
 use Wmud\HyperfLib\Response\AppResponse;
 use Throwable;
@@ -25,12 +26,11 @@ class SystemExceptionHandler extends ExceptionHandler
      * @return ResponseInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws AppException
      */
     public function handle(Throwable $throwable, ResponseInterface $response): ResponseInterface
     {
-        $requestId = Context::get('requestId');
         AppLog::error('System Exception', [
-            'requestId' => $requestId,
             'message' => $throwable->getMessage(),
             'line' => $throwable->getLine(),
             'file' => $throwable->getFile(),

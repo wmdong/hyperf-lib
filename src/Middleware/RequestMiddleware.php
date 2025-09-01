@@ -24,7 +24,7 @@ class RequestMiddleware extends AppBaseMiddleware
     public function logic(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $requestId = $request->getHeaderLine('Request-Id') ?: uniqid();
-        Context::set('requestId', $requestId);
+        Context::set('RequestId', $requestId);
         AppLog::info("Api Request $this->uri $this->ip", [
             'params' => $this->params,
         ]);

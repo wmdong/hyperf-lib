@@ -10,6 +10,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Wmud\HyperfLib\Constants\AppErrorCodeConstant;
+use Wmud\HyperfLib\Exception\AppException;
 use Wmud\HyperfLib\Response\AppResponse;
 use Throwable;
 
@@ -24,6 +25,7 @@ class HttpExceptionHandler extends ExceptionHandler
      * @return ResponseInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws AppException
      */
     public function handle(Throwable $throwable, ResponseInterface $response): ResponseInterface
     {
