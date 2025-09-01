@@ -41,7 +41,10 @@ class InitializeMiddleware extends AppBaseMiddleware
                     'data' => []
                 ]);
             }
-            $request = $request->withParsedBody($data);
+            foreach ($data as $key => $value) {
+                $this->params[$key] = $value;
+            }
+            $request = $request->withParsedBody($this->params);
         }
         return $handler->handle($request);
     }
